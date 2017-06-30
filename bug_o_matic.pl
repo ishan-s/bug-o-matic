@@ -75,6 +75,85 @@ sub get_next_keyword_value_loc{
 
 }
 
+sub get_kw_lists{
+	my($msg) = @_;
+	
+	my $msgl = $msg;
+	# look for 'bug#'
+	my @bug_list = ($msgl =~ m/bug#[0-9]+/ig);
+	
+	
+	# look for 'aru#'
+	$msgl = $msg;
+	my @aru_list = ($msgl =~ m/aru#[0-9]+:R12\.\w+\.\w+/ig);
+	
+	$msgl = $msg;
+	my @aru_list_2 = ($msgl =~ m/aru#[0-9]+/ig);
+	push @aru_list, @aru_list_2;
+	
+	# look for 'patch#'
+	$msgl = $msg;
+	my @patch_list = ($msgl =~ m/patch#[0-9]+:R12\.\w+\.\w+/ig);
+	
+	$msgl = $msg;
+	my @patch_list_2 = ($msgl =~ m/patch#[0-9]+/ig);
+	
+	push @patch_list, @patch_list_2;
+	push @aru_list, @patch_list;
+	
+	return (\@bug_list, \@aru_list);
+}
+
+sub add_links_footer{
+
+	my($msg) = @_;
+	Purple::Debug::info("bug-o-matic", "add links footer: ".$msg."\n");
+	
+	my $msgi = $msg;
+	my($bugs, $arus) = get_kw_lists($msgi);
+	Purple::Debug::info("bug-o-matic", "bugs ".@bugs."\n");
+	Purple::Debug::info("bug-o-matic", "arus  ".@arus."\n");
+	
+	my @urls;
+	my @titles;
+	# loop through the bugs
+	if(scalar(@$bugs)>0){
+		Purple::Debug::info("bug-o-matic", "bugs present "."\n");
+		for my $bug (@$bugs){
+			Purple::Debug::info("bug-o-matic", "now bug ".$bug."\n");
+			$val = substr($bug, index($bug, '#')+1);
+			push @urls, $bug_base_url.$val;
+			push @titles, "Bug ".$val;
+		}
+	}
+	
+	# loop through the aru/patces
+	if(scalar(@$arus)>0){
+	Purple::Debug::info("bug-o-matic", "arus present "."\n");
+		for my $aru (@$arus){
+		Purple::Debug::info("bug-o-matic", "now aru ".$aru."\n");
+			$val = substr($aru, index($aru, '#')+1);
+			push @urls, $aru_base_url.$val;
+			push @titles, "ARU ".$val;
+		}
+	}
+	
+	my $out_msg = $msg;
+	if(scalar(@urls)>0){
+		$out_msg = $out_msg."\n\n";
+		$out_msg = $out_msg."- bug-o-matic:links -";
+		for my $i (0 .. $#urls){
+			$out_msg = $out_msg."\n".scalar($i+1).". ".$titles[$i].": ".$urls[$i];
+		}
+	}
+	
+	return $out_msg;
+}
+
+sub check_bugomatic_ran{
+	my($msg) = @_;
+	return index($msg, "bug-o-matic:links");
+}
 sub add_links{
 	my($msg) = @_;
 	
@@ -114,7 +193,9 @@ sub conv_send_cb{
 	my($account,  $who, $msg) = @_;
 	
 	Purple::Debug::info("bug-o-matic", "send msg: ".$msg."\n");
-	$_[2] = add_links($msg);
+	if(check_bugomatic_ran($msg) eq -1){
+		$_[2] = add_links_footer($msg);
+	}
 	
 }
 
@@ -122,7 +203,9 @@ sub conv_recv_cb {
 	my($account, $who, $msg, $conv, $flags) = @_;	
 	Purple::Debug::info("bug-o-matic", "recv msg: ".$msg."\n");
 	
-	$_[2] = add_links($msg);
+	if(check_bugomatic_ran($msg) eq -1){
+		$_[2] = add_links_footer($msg);
+	}
 	
 }
 
