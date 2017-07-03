@@ -3,9 +3,14 @@
 !define PRODUCT_VERSION "0.0.1a"
 !define PRODUCT_PUBLISHER "Ishan Shrivastava"
 
-name "bug-o-matic Pidgin plugin for Oracle internal network"
+SetCompressor /SOLID zlib
+BrandingText "ishan.shrivastava@oracle.com"
+InstallColors /windows
+RequestExecutionLevel admin
+
+name "bug-o-matic Pidgin plugin for Oracle"
 OutFile "bug-o-matic-${PRODUCT_VERSION}.exe"
-  
+
 Function .onInit
 	ReadEnvStr $0 USERPROFILE
 	IfFileExists "$0\AppData\Roaming\.purple" pidginCheckTrue pidginCheckFalse
