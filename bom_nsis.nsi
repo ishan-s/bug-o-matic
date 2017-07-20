@@ -1,6 +1,6 @@
 
 !define PRODUCT_NAME "bug-o-matic"
-!define PRODUCT_VERSION "0.0.1a"
+!define PRODUCT_VERSION "0.0.2a"
 !define PRODUCT_PUBLISHER "Ishan Shrivastava"
 
 SetCompressor /SOLID zlib
