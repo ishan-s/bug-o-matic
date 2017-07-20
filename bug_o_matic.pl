@@ -138,6 +138,8 @@ sub add_links_footer{
 		}
 	}
 	
+	
+	Purple::Debug::info("bug-o-matic", "msg still: ".$msg."\n");
 	my $out_msg = $msg;
 	if(scalar(@urls)>0){
 		$out_msg = $out_msg."\n\n";
@@ -147,6 +149,7 @@ sub add_links_footer{
 		}
 	}
 	
+	Purple::Debug::info("bug-o-matic", "out_msg still: ".$out_msg."\n");
 	return $out_msg;
 }
 
@@ -197,6 +200,7 @@ sub conv_send_cb{
 		$_[2] = add_links_footer($msg);
 	}
 	
+	Purple::Debug::info("bug-o-matic", "send msg out: ".$_[2]."\n");
 }
 
 sub conv_recv_cb {
@@ -207,6 +211,7 @@ sub conv_recv_cb {
 		$_[2] = add_links_footer($msg);
 	}
 	
+	Purple::Debug::info("bug-o-matic", "recv msg out: ".$_[2]."\n");
 }
 
 
